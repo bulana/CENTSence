@@ -4,17 +4,15 @@ import com.bulana.centsense.data.Account
 
 sealed class AccountEvent {
 
-    data class DeleteAccount(val account: Account) : AccountEvent()
+    data class onDeleteAccountClick(val account: Account) : AccountEvent()
 
-    data class OnDoneChanged(val account: Account, val isDone: Boolean) : AccountEvent()
+    data class OnDoneChange(val account: Account) : AccountEvent()
 
-    data class OnUndoDeleteClick(val account: Account) : AccountEvent()
+    data object OnUndoDeleteClick : AccountEvent()
 
     data object OnAddAccountClick : AccountEvent()
 
     data class OnAccountClick(val account: Account) : AccountEvent()
-
-    data class UpdateAccount(val id: Int, val updatedAccount: Account) : AccountEvent()
 
     data object LoadAccounts : AccountEvent()
 

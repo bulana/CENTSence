@@ -6,11 +6,13 @@ import com.bulana.centsense.data.Account
 import com.bulana.centsense.data.AccountRepository
 import com.bulana.centsense.util.Routes
 import com.bulana.centsense.util.UiEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class AccountsListViewModel @Inject constructor(
     private val repository: AccountRepository
 ) : ViewModel() {
@@ -21,37 +23,45 @@ class AccountsListViewModel @Inject constructor(
 
     val uiEvent = _uiEvent.receiveAsFlow()
 
-    private var deleteAccount: Account? = null
+    private var deletedAccount: Account? = null
 
     fun onEvent(event: AccountEvent) {
 
         when (event) {
 
             is AccountEvent.OnAccountClick -> {
-                sendUiEvent(event = UiEvent.Navigate(Routes.ADD_EDIT_ACCOUNT + "?accountId=${event.account.accountNumber}"))
+
+                sendUiEvent(
+                    event = UiEvent.Navigate(
+                        Routes.ADD_EDIT_ACCOUNT + "?accountId=${event.account.accountNumber}"
+                    )
+                )
             }
 
             is AccountEvent.OnAddAccountClick -> {
-                sendUiEvent(event = UiEvent.Navigate(Routes.ADD_EDIT_ACCOUNT))
+
+                sendUiEvent(
+                    event = UiEvent.Navigate(Routes.ADD_EDIT_ACCOUNT))
             }
 
-            is AccountEvent.OnDoneChanged -> {
+            is AccountEvent.OnDoneChange -> {
+
                 viewModelScope.launch {
 
                     repository.insertAccount(
-                        event.account.copy(
-                            isDone = event.isDone
-                        )
+                        event.account.copy()
                     )
+
                 }
             }
 
-            is AccountEvent.OnUndoDeleteClick -> {
+            is AccountEvent.onDeleteAccountClick -> {
+
                 viewModelScope.launch {
 
-                    deleteAccount = event.account
+                    deletedAccount = event.account
 
-                    repository.deleteAccount(event.account)
+                    repository.deleteAccount(account = event.account)
 
                     sendUiEvent(
                         UiEvent.ShowSnackbar(
@@ -59,21 +69,19 @@ class AccountsListViewModel @Inject constructor(
                             action = "Undo"
                         )
                     )
-
                 }
             }
 
-            is AccountEvent.DeleteAccount -> {
-                deleteAccount?.let {
+            is AccountEvent.OnUndoDeleteClick -> {
+                deletedAccount?.let { account ->
                     viewModelScope.launch {
-                        repository.deleteAccount(id = event.account)
+                        repository.insertAccount(account = account)
                     }
                 }
             }
 
             else -> {}
         }
-
     }
 
     private fun sendUiEvent(event: UiEvent) {

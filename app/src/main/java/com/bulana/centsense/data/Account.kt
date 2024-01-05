@@ -8,17 +8,17 @@ import java.util.Date
 data class Account(
     @PrimaryKey val accountNumber: String,
     val accountName: String,
-    val loanAmount: Double,
+    val accountType: String,
+    val openingBalance: Double,
+    val closingBalance: Double,
     val annualInterestRate: Double,
     val monthlyInstallment: Double,
     val firstPaymentDueDate: Date,
     val lastPaymentDueDate: Date,
-    val numberOfInstallmentsDue: Int,
+    val numberOfInstallmentsRemaining: Int,
     val originalTermMonths: Int,
-    val openingBalance: Double,
-    val closingBalance: Double,
     val totalArrears: Double,
     val currentDue: Double,
-    val totalAmountDue: Double,
+    val settlement: Double,
     val isDone: Boolean
 )

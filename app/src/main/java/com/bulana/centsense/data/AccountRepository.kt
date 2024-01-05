@@ -10,6 +10,6 @@ interface AccountRepository {
 
     fun getAllAccounts(): Flow<List<Account>>
 
-    suspend fun deleteAccount(id: Account)
+    suspend fun deleteAccount(account: Account)
 
 }
