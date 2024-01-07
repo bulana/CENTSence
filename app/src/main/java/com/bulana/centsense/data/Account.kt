@@ -20,5 +20,5 @@ data class Account(
     val totalArrears: Double,
     val currentDue: Double,
     val settlement: Double,
-    val isDone: Boolean
+    val isPaidUp: Boolean
 )

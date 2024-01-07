@@ -7,7 +7,7 @@ import com.bulana.centsense.util.DateConverter
 
 @Database(
     entities = [Account::class],
-    version = 1
+    version = 2
 )
 @TypeConverters(DateConverter::class)
 abstract class AccountDatabase : RoomDatabase() {

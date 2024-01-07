@@ -13,11 +13,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AccountsListViewModel @Inject constructor(
+open class AccountsListViewModel @Inject constructor(
     private val repository: AccountRepository
 ) : ViewModel() {
 
-    val accountsList = repository.getAllAccounts()
+    open val accountsList = repository.getAllAccounts()
 
     private val _uiEvent = Channel<UiEvent>()
 
@@ -41,21 +41,21 @@ class AccountsListViewModel @Inject constructor(
             is AccountEvent.OnAddAccountClick -> {
 
                 sendUiEvent(
-                    event = UiEvent.Navigate(Routes.ADD_EDIT_ACCOUNT))
+                    event = UiEvent.Navigate(Routes.ADD_EDIT_ACCOUNT)
+                )
             }
 
-            is AccountEvent.OnDoneChange -> {
+            is AccountEvent.OnPaidUpChange -> {
 
                 viewModelScope.launch {
 
                     repository.insertAccount(
-                        event.account.copy()
+                        event.account.copy(isPaidUp = event.isPaidUp)
                     )
-
                 }
             }
 
-            is AccountEvent.onDeleteAccountClick -> {
+            is AccountEvent.OnDeleteAccountClick -> {
 
                 viewModelScope.launch {
 

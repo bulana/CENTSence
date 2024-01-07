@@ -177,7 +177,7 @@ class AddEditAccountViewModel @Inject constructor(
                             totalArrears = totalArrears,
                             currentDue = currentDue,
                             settlement = settlement,
-                            isDone = false
+                            isPaidUp = false
                         )
                     )
                     sendUiEvent(UiEvent.PopBackStack)
@@ -222,5 +222,4 @@ class AddEditAccountViewModel @Inject constructor(
 
         return true
     }
-
 }

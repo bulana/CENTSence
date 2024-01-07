@@ -20,18 +20,14 @@ import androidx.compose.material.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 
+val grey = Color(0xFF757575)
+
 @Composable
 fun AccountItem(
     account: Account,
     modifier: Modifier = Modifier,
     onEvent: (AccountEvent) -> Unit
 ) {
-
-    val navyBlue = Color(0xFF061D95)
-
-    val green = Color(0xFF60A917)
-
-    val grey = Color(0xFF757575)
 
     Card(
         modifier = modifier
@@ -51,7 +47,7 @@ fun AccountItem(
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .background(color = navyBlue),
+                        .background(color = grey),
                     verticalArrangement = Arrangement.Center,
                 ) {
 
@@ -78,14 +74,14 @@ fun AccountItem(
                 ) {
 
                     AccountDetail(
-                        label = "Current Balance",
-                        value = "R ${account.currentDue}",
+                        label = "Installment",
+                        value = "R ${account.monthlyInstallment}",
                         color = grey
                     )
 
                     AccountDetail(
-                        label = "Installment",
-                        value = "R ${account.monthlyInstallment}",
+                        label = "Current Balance",
+                        value = "R ${account.currentDue}",
                         color = grey
                     )
 
@@ -112,12 +108,12 @@ fun AccountItem(
                 Text(
                     text = "Delete",
                     color = Color.DarkGray,
-                    fontSize = 10.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Thin,
                     modifier = Modifier
                         .clickable {
                             onEvent(
-                                AccountEvent.onDeleteAccountClick(
+                                AccountEvent.OnDeleteAccountClick(
                                     account = account
                                 )
                             )
@@ -127,32 +123,11 @@ fun AccountItem(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                Button(
-                    onClick = {
-                        onMoreInfoClicked()
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = green
-                    ),
-                    shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier
-                        .wrapContentWidth(Alignment.Start),
-                    contentPadding = PaddingValues(
-                        start = 4.dp,
-                        top = 0.dp,
-                        end = 4.dp,
-                        bottom = 0.dp
-                    )
-                ) {
-                    Text(
-                        text = "More info",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 10.sp,
-                        modifier = Modifier.padding(4.dp)
-                    )
-                }
-
+                OutlinedButton(
+                    onMoreInfoClicked = {
+                        onEvent(AccountEvent.OnAccountClick(account))
+                    }
+                )
             }
         }
     }
@@ -234,7 +209,7 @@ fun AccountDetail(label: String, value: String, color: Color) {
         Text(
             text = "$label:",
             color = color,
-            fontSize = 10.sp,
+            fontSize = 12.sp,
             modifier = Modifier.width(150.dp)
         )
 
@@ -243,8 +218,35 @@ fun AccountDetail(label: String, value: String, color: Color) {
         Text(
             text = value,
             color = color,
-            fontSize = 10.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold
+        )
+    }
+}
+
+@Composable
+fun OutlinedButton(onMoreInfoClicked: () -> Unit) {
+    OutlinedButton(
+        onClick = { onMoreInfoClicked() },
+        shape = RoundedCornerShape(24.dp),
+        modifier = Modifier.wrapContentWidth(Alignment.Start),
+        contentPadding = PaddingValues(
+            start = 4.dp,
+            top = 0.dp,
+            end = 4.dp,
+            bottom = 0.dp
+        ),
+        colors = ButtonDefaults.outlinedButtonColors(
+            backgroundColor = Color.Transparent,
+            contentColor = Color.Black
+        )
+    ) {
+        Text(
+            text = "More info",
+            color = grey,
+            fontWeight = FontWeight.Bold,
+            fontSize = 10.sp,
+            modifier = Modifier.padding(4.dp)
         )
     }
 }
@@ -268,7 +270,7 @@ fun AccountItemPreview_1() {
         totalArrears = 200.0,
         currentDue = 56000.0,
         settlement = 399000.0,
-        isDone = false
+        isPaidUp = false
     )
 
     AccountItem(account = account, onEvent = {})
@@ -293,7 +295,7 @@ fun AccountItemPreview_2() {
         totalArrears = 200.0,
         currentDue = 480000.0,
         settlement = 8000.0,
-        isDone = false
+        isPaidUp = false
     )
 
     AccountItem(account = account, onEvent = {})
@@ -318,7 +320,7 @@ fun AccountItemPreview_3() {
         totalArrears = 200.0,
         currentDue = 100.0,
         settlement = 1100.0,
-        isDone = false
+        isPaidUp = false
     )
 
     AccountItem(account = account, onEvent = {})

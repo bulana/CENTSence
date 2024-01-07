@@ -6,17 +6,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bulana.centsense.util.UiEvent
@@ -49,16 +57,36 @@ fun AddEditAccountScreen(
         }
     })
 
+    var accountName by remember { mutableStateOf(viewModel.account?.accountName ?: "") }
+    var accountNumber by remember { mutableStateOf(viewModel.account?.accountNumber ?: "") }
+    var accountType by remember { mutableStateOf(viewModel.account?.accountType ?: "") }
+    var openingBalanceText by remember {
+        mutableStateOf(viewModel.account?.openingBalance?.toString() ?: "")
+    }
+    var currentDueText by remember {
+        mutableStateOf(viewModel.account?.currentDue?.toString() ?: "")
+    }
+    var monthlyInstallmentText by remember {
+        mutableStateOf(viewModel.account?.monthlyInstallment?.toString() ?: "")
+    }
+
     Scaffold(
         scaffoldState = scaffoldState,
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                viewModel.onEvent(AddEditAccountEvent.OnSaveAccountClick)
-            }) {
-                Icon(imageVector = Icons.Default.Check, contentDescription = "Save")
+            FloatingActionButton(
+                onClick = {
+                    viewModel.onEvent(AddEditAccountEvent.OnSaveAccountClick)
+                },
+                backgroundColor = Color(0xFF757575)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Save",
+                    tint = Color.White
+                )
             }
         }
     ) { paddingValues ->
@@ -68,54 +96,114 @@ fun AddEditAccountScreen(
                 .fillMaxSize()
         ) {
 
-            // Account Name
-            TextField(
-                value = viewModel.account?.accountName ?: "",
-                onValueChange = { viewModel.onEvent(AddEditAccountEvent.onAccountNameChange(it)) },
-                placeholder = { Text(text = "Account Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-            // Account Number
-            TextField(
-                value = viewModel.account?.accountNumber ?: "",
-                onValueChange = { newNumber ->
-                    viewModel.onEvent(AddEditAccountEvent.onAccountNumberChange(newNumber))
+            // Account Name OutlinedTextField
+            OutlinedTextField(
+                value = accountName,
+                onValueChange = { newAccountName ->
+                    accountName = newAccountName
+                    viewModel.onEvent(AddEditAccountEvent.onAccountNameChange(newAccountName))
                 },
-                placeholder = { Text(text = "Account number") },
-                modifier = Modifier.fillMaxWidth()
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color(0xFF000000),
+                    focusedLabelColor = Color(0xFF000000),
+                    cursorColor = Color(0xFF000000)
+                ),
+                label = { Text(text = "Account Name") },
+                modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Account Type
-            TextField(
-                value = viewModel.account?.accountType ?: "",
-                onValueChange = { newType ->
-                    viewModel.onEvent(AddEditAccountEvent.onAccountTypeChange(newType))
+            // Monthly Installment
+            OutlinedTextField(
+                value = monthlyInstallmentText,
+                onValueChange = { newValue ->
+                    monthlyInstallmentText = newValue
+
+                    val newDoubleValue = newValue.toDoubleOrNull() ?: 0.0
+                    viewModel.onEvent(AddEditAccountEvent.onMonthlyInstallmentChange(newDoubleValue))
                 },
-                placeholder = { Text(text = "Account type") },
-                modifier = Modifier.fillMaxWidth()
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color(0xFF000000),
+                    focusedLabelColor = Color(0xFF000000),
+                    cursorColor = Color(0xFF000000)
+                ),
+                label = { Text(text = "Monthly Installment") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             Spacer(modifier = Modifier.height(8.dp))
-//
-//            // Opening Balance
-//
-//            TextField(
-//                value = viewModel.account?.openingBalance?.toString() ?: "",
-//                onValueChange = { newValueString ->
-//                    // Convert the new string value to Double
-//                    val newDoubleValue = newValueString.toDoubleOrNull() // Handle null if conversion fails
-//                    if (newDoubleValue != null) {
-//                        // Only update if conversion is successful
-//                        viewModel.onEvent(AddEditAccountEvent.onOpeningBalanceChange(newDoubleValue))
-//                    }
-//                },
-//                placeholder = { Text(text = "Opening Balance") },
-//                modifier = Modifier.fillMaxWidth(),
-//                keyboardType = KeyboardType.Number
-//            )
+
+            // Opening Balance OutlinedTextField
+            OutlinedTextField(
+                value = openingBalanceText,
+                onValueChange = { newValueString ->
+                    // Update the local state with the new string
+                    openingBalanceText = newValueString
+
+                    // Attempt to convert the new string value to Double
+                    val newDoubleValue = newValueString.toDoubleOrNull()
+                    if (newDoubleValue != null) {
+                        // Only update ViewModel if conversion is successful
+                        viewModel.onEvent(AddEditAccountEvent.onOpeningBalanceChange(newDoubleValue))
+                    }
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color(0xFF000000),
+                    focusedLabelColor = Color(0xFF000000),
+                    cursorColor = Color(0xFF000000)
+                ),
+                label = { Text(text = "Opening Balance") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+            // Account Number OutlinedTextField
+            OutlinedTextField(
+                value = accountNumber,
+                onValueChange = { newAccountNumber ->
+                    accountNumber = newAccountNumber
+                    viewModel.onEvent(AddEditAccountEvent.onAccountNumberChange(newAccountNumber))
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color(0xFF000000),
+                    focusedLabelColor = Color(0xFF000000),
+                    cursorColor = Color(0xFF000000)
+                ),
+                label = { Text(text = "Account Number") },
+                modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Account Type OutlinedTextField
+            OutlinedTextField(
+                value = accountType,
+                onValueChange = { newAccountType ->
+                    accountType = newAccountType
+                    viewModel.onEvent(AddEditAccountEvent.onAccountTypeChange(newAccountType))
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color(0xFF000000),
+                    focusedLabelColor = Color(0xFF000000),
+                    cursorColor = Color(0xFF000000)
+                ),
+                label = { Text(text = "Account Type") },
+                modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
 //
 //            // Closing Balance
 //            TextField(
@@ -151,21 +239,6 @@ fun AddEditAccountScreen(
 //            )
 //            Spacer(modifier = Modifier.height(8.dp))
 //
-//            // Monthly Installment
-//            TextField(
-//                value = viewModel.account?.monthlyInstallment?.toString() ?: "",
-//                onValueChange = {
-//                    viewModel.onEvent(
-//                        AddEditAccountEvent.onMonthlyInstallmentChange(
-//                            it.toDoubleOrNull() ?: 0.0
-//                        )
-//                    )
-//                },
-//                placeholder = { Text(text = "Monthly Installment") },
-//                modifier = Modifier.fillMaxWidth(),
-//                keyboardType = KeyboardType.Number
-//            )
-//            Spacer(modifier = Modifier.height(8.dp))
 //
 //
 //            // First Payment Due Date
@@ -283,19 +356,20 @@ fun AddEditAccountScreen(
 //            )
 //            Spacer(modifier = Modifier.height(8.dp))
 //
-//            // Current Due
-//            TextField(
-//                value = viewModel.account?.currentDue?.toString() ?: "",
-//                onValueChange = {
-//                    viewModel.onEvent(
-//                        AddEditAccountEvent.onCurrentDueChange(
-//                            it.toDoubleOrNull() ?: 0.0
-//                        )
-//                    )
+//            // Current Due OutlinedTextField
+//            OutlinedTextField(
+//                value = currentDueText,
+//                onValueChange = { newValue ->
+//                    // Update the local state with the new string
+//                    currentDueText = newValue
+//
+//                    // Convert the new string value to Double and update ViewModel
+//                    val newDoubleValue = newValue.toDoubleOrNull() ?: 0.0
+//                    viewModel.onEvent(AddEditAccountEvent.onCurrentDueChange(newDoubleValue))
 //                },
-//                placeholder = { Text(text = "Current Due") },
+//                label = { Text(text = "Current Due") },
 //                modifier = Modifier.fillMaxWidth(),
-//                keyboardType = KeyboardType.Number
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
 //            )
 //            Spacer(modifier = Modifier.height(8.dp))
 //
