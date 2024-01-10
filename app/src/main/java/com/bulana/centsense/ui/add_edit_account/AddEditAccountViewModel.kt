@@ -41,6 +41,8 @@ class AddEditAccountViewModel @Inject constructor(
 
     private var monthlyInstallment by mutableDoubleStateOf(0.0)
 
+    private var totalAdditionalFees by mutableDoubleStateOf(0.0)
+
     private var firstPaymentDueDate by mutableStateOf(Date())
 
     private var lastPaymentDueDate by mutableStateOf(Date())
@@ -77,6 +79,7 @@ class AddEditAccountViewModel @Inject constructor(
                         closingBalance = account.closingBalance
                         annualInterestRate = account.annualInterestRate
                         monthlyInstallment = account.monthlyInstallment
+                        totalAdditionalFees = account.totalAdditionalFees
                         firstPaymentDueDate = account.firstPaymentDueDate
                         lastPaymentDueDate = account.lastPaymentDueDate
                         numberOfInstallmentsRemaining = account.numberOfInstallmentsRemaining
@@ -121,6 +124,10 @@ class AddEditAccountViewModel @Inject constructor(
 
             is AddEditAccountEvent.onMonthlyInstallmentChange -> {
                 monthlyInstallment = event.monthlyInstallment
+            }
+
+            is AddEditAccountEvent.onAdditionalFeesChange -> {
+                totalAdditionalFees = event.totalAdditionalFees
             }
 
             is AddEditAccountEvent.onFirstPaymentDueDaterChange -> {
@@ -170,6 +177,7 @@ class AddEditAccountViewModel @Inject constructor(
                             closingBalance = closingBalance,
                             annualInterestRate = annualInterestRate,
                             monthlyInstallment = monthlyInstallment,
+                            totalAdditionalFees = totalAdditionalFees,
                             firstPaymentDueDate = firstPaymentDueDate,
                             lastPaymentDueDate = lastPaymentDueDate,
                             numberOfInstallmentsRemaining = numberOfInstallmentsRemaining,
@@ -209,6 +217,8 @@ class AddEditAccountViewModel @Inject constructor(
         if (account.annualInterestRate !in 0.0..100.0) return false
 
         if (account.monthlyInstallment < 0) return false
+
+        if (account.totalAdditionalFees < 0) return false
 
         if (account.firstPaymentDueDate.after(account.lastPaymentDueDate)) return false
 

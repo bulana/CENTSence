@@ -43,6 +43,8 @@ fun AccountListScreen(
 
     val grey = Color(0xFF757575)
 
+    val blue = Color(0xFF002D49)
+
     val scaffoldState = rememberScaffoldState()
 
     LaunchedEffect(key1 = true, block = {
@@ -79,14 +81,13 @@ fun AccountListScreen(
     })
 
     Scaffold(
-
         scaffoldState = scaffoldState,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
                     viewModel.onEvent(AccountEvent.OnAddAccountClick)
                 },
-                backgroundColor = Color(0xFF757575)
+                backgroundColor = blue
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -104,7 +105,7 @@ fun AccountListScreen(
                 .padding(innerPadding)
         ) {
             if (accounts.value.isEmpty()) {
-                // Display a message when there are no accounts
+
                 Text(
                     text = "No accounts added. Please add an account.",
                     fontSize = 24.sp,
@@ -112,12 +113,13 @@ fun AccountListScreen(
                     style = MaterialTheme.typography.h6,
                     modifier = Modifier.padding(16.dp)
                 )
+
             } else {
-                // Display account count and total installment value
+
                 Text(
                     text = "${accounts.value.size} Accounts",
                     fontSize = 24.sp,
-                    color = grey,
+                    color = blue,
                     style = MaterialTheme.typography.h6,
                     modifier = Modifier.padding(16.dp)
                 )
@@ -128,10 +130,12 @@ fun AccountListScreen(
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    
                     Text(
-                        "Total Installment Value",
+                        "All-Account Payment Sum",
                         color = grey,
-                        style = MaterialTheme.typography.subtitle1
+                        style = MaterialTheme.typography.subtitle1,
+                        fontWeight = FontWeight.SemiBold
                     )
 
                     Text(

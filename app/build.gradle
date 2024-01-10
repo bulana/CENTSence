@@ -101,7 +101,4 @@ dependencies {
     // Google Accompanist
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.27.0"
 
-    // Biometrics
-    implementation "androidx.biometric:biometric:1.2.0"
-
 }

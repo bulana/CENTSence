@@ -32,6 +32,10 @@ sealed class AddEditAccountEvent {
         val monthlyInstallment: Double
     ) : AddEditAccountEvent()
 
+    data class onAdditionalFeesChange(
+        val totalAdditionalFees: Double
+    ) : AddEditAccountEvent()
+
     data class onFirstPaymentDueDaterChange(
         val firstPaymentDueDate: Date
     ) : AddEditAccountEvent()

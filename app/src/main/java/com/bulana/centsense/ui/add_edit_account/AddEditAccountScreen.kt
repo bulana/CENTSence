@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -19,6 +20,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bulana.centsense.util.UiEvent
 
@@ -36,6 +39,31 @@ fun AddEditAccountScreen(
 ) {
 
     val scaffoldState = rememberScaffoldState()
+
+    val blue = Color(0xFF002D49)
+    val grey = Color(0xFF757575)
+
+    var accountName by remember { mutableStateOf(viewModel.account?.accountName ?: "") }
+    var accountNumber by remember { mutableStateOf(viewModel.account?.accountNumber ?: "") }
+    var accountType by remember { mutableStateOf(viewModel.account?.accountType ?: "") }
+    var openingBalanceText by remember {
+        mutableStateOf(viewModel.account?.openingBalance?.toString() ?: "")
+    }
+    var currentDueText by remember {
+        mutableStateOf(viewModel.account?.currentDue?.toString() ?: "")
+    }
+    var monthlyInstallmentText by remember {
+        mutableStateOf(viewModel.account?.monthlyInstallment?.toString() ?: "")
+    }
+    var interestRateText by remember {
+        mutableStateOf(viewModel.account?.annualInterestRate?.toString() ?: "")
+    }
+    var additionalFeesText by remember {
+        mutableStateOf(viewModel.account?.totalAdditionalFees?.toString() ?: "")
+    }
+    var originalTermMonthsText by remember {
+        mutableStateOf(viewModel.account?.originalTermMonths?.toString() ?: "")
+    }
 
     LaunchedEffect(key1 = true, block = {
 
@@ -57,19 +85,6 @@ fun AddEditAccountScreen(
         }
     })
 
-    var accountName by remember { mutableStateOf(viewModel.account?.accountName ?: "") }
-    var accountNumber by remember { mutableStateOf(viewModel.account?.accountNumber ?: "") }
-    var accountType by remember { mutableStateOf(viewModel.account?.accountType ?: "") }
-    var openingBalanceText by remember {
-        mutableStateOf(viewModel.account?.openingBalance?.toString() ?: "")
-    }
-    var currentDueText by remember {
-        mutableStateOf(viewModel.account?.currentDue?.toString() ?: "")
-    }
-    var monthlyInstallmentText by remember {
-        mutableStateOf(viewModel.account?.monthlyInstallment?.toString() ?: "")
-    }
-
     Scaffold(
         scaffoldState = scaffoldState,
         modifier = Modifier
@@ -80,7 +95,7 @@ fun AddEditAccountScreen(
                 onClick = {
                     viewModel.onEvent(AddEditAccountEvent.OnSaveAccountClick)
                 },
-                backgroundColor = Color(0xFF757575)
+                backgroundColor = blue
             ) {
                 Icon(
                     imageVector = Icons.Default.Check,
@@ -96,6 +111,14 @@ fun AddEditAccountScreen(
                 .fillMaxSize()
         ) {
 
+            Text(
+                text = "Create account",
+                fontSize = 24.sp,
+                color = blue,
+                style = MaterialTheme.typography.h6,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
             // Account Name OutlinedTextField
             OutlinedTextField(
                 value = accountName,
@@ -104,37 +127,15 @@ fun AddEditAccountScreen(
                     viewModel.onEvent(AddEditAccountEvent.onAccountNameChange(newAccountName))
                 },
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF000000),
-                    focusedLabelColor = Color(0xFF000000),
-                    cursorColor = Color(0xFF000000)
+                    focusedBorderColor = blue,
+                    focusedLabelColor = blue,
+                    cursorColor = blue
                 ),
                 label = { Text(text = "Account Name") },
                 modifier =
                 Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Monthly Installment
-            OutlinedTextField(
-                value = monthlyInstallmentText,
-                onValueChange = { newValue ->
-                    monthlyInstallmentText = newValue
-
-                    val newDoubleValue = newValue.toDoubleOrNull() ?: 0.0
-                    viewModel.onEvent(AddEditAccountEvent.onMonthlyInstallmentChange(newDoubleValue))
-                },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF000000),
-                    focusedLabelColor = Color(0xFF000000),
-                    cursorColor = Color(0xFF000000)
-                ),
-                label = { Text(text = "Monthly Installment") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -153,9 +154,9 @@ fun AddEditAccountScreen(
                     }
                 },
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF000000),
-                    focusedLabelColor = Color(0xFF000000),
-                    cursorColor = Color(0xFF000000)
+                    focusedBorderColor = blue,
+                    focusedLabelColor = blue,
+                    cursorColor = blue
                 ),
                 label = { Text(text = "Opening Balance") },
                 modifier = Modifier.fillMaxWidth(),
@@ -163,24 +164,91 @@ fun AddEditAccountScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-
-            // Account Number OutlinedTextField
+            // Account Full Term OutlinedTextField
             OutlinedTextField(
-                value = accountNumber,
-                onValueChange = { newAccountNumber ->
-                    accountNumber = newAccountNumber
-                    viewModel.onEvent(AddEditAccountEvent.onAccountNumberChange(newAccountNumber))
+                value = originalTermMonthsText,
+                onValueChange = { originalTermMonths ->
+                    originalTermMonthsText = originalTermMonths
+
+                    val newIntValue = originalTermMonths.toInt()
+                    viewModel.onEvent(AddEditAccountEvent.onOriginalTermMonthsChange(newIntValue))
                 },
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF000000),
-                    focusedLabelColor = Color(0xFF000000),
-                    cursorColor = Color(0xFF000000)
+                    focusedBorderColor = blue,
+                    focusedLabelColor = blue,
+                    cursorColor = blue
                 ),
-                label = { Text(text = "Account Number") },
+                label = { Text(text = "Account Full Term") },
                 modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp)
+                    .padding(bottom = 16.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Monthly Installment
+            OutlinedTextField(
+                value = monthlyInstallmentText,
+                onValueChange = { newValue ->
+                    monthlyInstallmentText = newValue
+
+                    val newDoubleValue = newValue.toDoubleOrNull() ?: 0.0
+                    viewModel.onEvent(AddEditAccountEvent.onMonthlyInstallmentChange(newDoubleValue))
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = blue,
+                    focusedLabelColor = blue,
+                    cursorColor = blue
+                ),
+                label = { Text(text = "Monthly Installment") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Annual Interest Rate OutlinedTextField
+            OutlinedTextField(
+                value = interestRateText,
+                onValueChange = { newText ->
+                    interestRateText = newText
+
+                    val newDoubleValue = newText.toDoubleOrNull() ?: 0.0
+                    viewModel.onEvent(AddEditAccountEvent.onAnnualInterestRateChange(newDoubleValue))
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = blue,
+                    focusedLabelColor = blue,
+                    cursorColor = blue
+                ),
+                label = { Text(text = "Annual Interest Rate") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Additional Fees OutlinedTextField
+            OutlinedTextField(
+                value = additionalFeesText,
+                onValueChange = { newText ->
+                    additionalFeesText = newText
+
+                    val newDoubleValue = newText.toDoubleOrNull() ?: 0.0
+                    viewModel.onEvent(AddEditAccountEvent.onAdditionalFeesChange(newDoubleValue))
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = blue,
+                    focusedLabelColor = blue,
+                    cursorColor = blue
+                ),
+                label = { Text(text = "Total additional Fees(VAT, services, insurances)") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -192,11 +260,31 @@ fun AddEditAccountScreen(
                     viewModel.onEvent(AddEditAccountEvent.onAccountTypeChange(newAccountType))
                 },
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF000000),
-                    focusedLabelColor = Color(0xFF000000),
-                    cursorColor = Color(0xFF000000)
+                    focusedBorderColor = blue,
+                    focusedLabelColor = blue,
+                    cursorColor = blue
                 ),
                 label = { Text(text = "Account Type") },
+                modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Account Number OutlinedTextField
+            OutlinedTextField(
+                value = accountNumber,
+                onValueChange = { newAccountNumber ->
+                    accountNumber = newAccountNumber
+                    viewModel.onEvent(AddEditAccountEvent.onAccountNumberChange(newAccountNumber))
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = blue,
+                    focusedLabelColor = blue,
+                    cursorColor = blue
+                ),
+                label = { Text(text = "Account Number") },
                 modifier =
                 Modifier
                     .fillMaxWidth()
@@ -223,21 +311,6 @@ fun AddEditAccountScreen(
 //            )
 //            Spacer(modifier = Modifier.height(8.dp))
 //
-//            // Annual Interest Rate
-//            TextField(
-//                value = viewModel.account?.annualInterestRate?.toString() ?: "",
-//                onValueChange = {
-//                    viewModel.onEvent(
-//                        AddEditAccountEvent.onAnnualInterestRateChange(
-//                            it.toDoubleOrNull() ?: 0.0
-//                        )
-//                    )
-//                },
-//                placeholder = { Text(text = "Annual Interest Rate") },
-//                modifier = Modifier.fillMaxWidth(),
-//                keyboardType = KeyboardType.Number
-//            )
-//            Spacer(modifier = Modifier.height(8.dp))
 //
 //
 //
@@ -388,7 +461,6 @@ fun AddEditAccountScreen(
 //                keyboardType = KeyboardType.Number
 //            )
 //            Spacer(modifier = Modifier.height(8.dp))
-
 
         }
     }

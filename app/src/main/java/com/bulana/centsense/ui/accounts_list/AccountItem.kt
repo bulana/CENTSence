@@ -22,6 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 
 val grey = Color(0xFF757575)
 
+val blue = Color(0xFF002D49)
+
 @Composable
 fun AccountItem(
     account: Account,
@@ -47,7 +49,7 @@ fun AccountItem(
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .background(color = grey),
+                        .background(color = blue),
                     verticalArrangement = Arrangement.Center,
                 ) {
 
@@ -74,20 +76,31 @@ fun AccountItem(
                 ) {
 
                     AccountDetail(
-                        label = "Installment",
-                        value = "R ${account.monthlyInstallment}",
+                        label = "Original Loan",
+                        value = "R ${account.openingBalance}",
                         color = grey
                     )
 
+                    val fullTermTotalInstallment =
+                        account.monthlyInstallment * account.originalTermMonths
+
                     AccountDetail(
-                        label = "Current Balance",
-                        value = "R ${account.currentDue}",
+                        label = "Full Term Installment",
+                        value = "R $fullTermTotalInstallment",
                         color = grey
                     )
 
+                    val totalInterestAndFees = fullTermTotalInstallment - account.openingBalance
+
+                    AccountDetailForAdditionalFees(
+                        label = "Term Interest and Fees",
+                        value = "R $totalInterestAndFees",
+                        color = blue
+                    )
+
                     AccountDetail(
-                        label = "Interest Rate",
-                        value = "${account.annualInterestRate} %",
+                        label = "Full Term",
+                        value = "${account.originalTermMonths}",
                         color = grey
                     )
                 }
@@ -107,9 +120,9 @@ fun AccountItem(
 
                 Text(
                     text = "Delete",
-                    color = Color.DarkGray,
+                    color = blue,
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.Thin,
+                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
                         .clickable {
                             onEvent(
@@ -118,13 +131,13 @@ fun AccountItem(
                                 )
                             )
                         }
-                        .padding(end = 16.dp)
+                        .padding(end = 18.dp)
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
 
                 OutlinedButton(
-                    onMoreInfoClicked = {
+                    onReportClicked = {
                         onEvent(AccountEvent.OnAccountClick(account))
                     }
                 )
@@ -133,7 +146,7 @@ fun AccountItem(
     }
 }
 
-private fun onMoreInfoClicked() {}
+private fun onReportClicked() {}
 
 @Composable
 fun AccountTitle(label: String, value: String) {
@@ -199,6 +212,38 @@ fun AccountSubTitle(label: String, value: String) {
 }
 
 @Composable
+fun AccountDetailForAdditionalFees(
+    label: String,
+    value: String,
+    color: Color
+) {
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Text(
+            text = "$label:",
+            color = color,
+            fontSize = 12.sp,
+            modifier = Modifier.width(150.dp),
+            fontWeight = FontWeight.ExtraBold
+        )
+
+        Spacer(Modifier.weight(1f))
+
+        Text(
+            text = value,
+            color = Color.Red,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+    }
+}
+
+@Composable
 fun AccountDetail(label: String, value: String, color: Color) {
 
     Row(
@@ -225,9 +270,9 @@ fun AccountDetail(label: String, value: String, color: Color) {
 }
 
 @Composable
-fun OutlinedButton(onMoreInfoClicked: () -> Unit) {
+fun OutlinedButton(onReportClicked: () -> Unit) {
     OutlinedButton(
-        onClick = { onMoreInfoClicked() },
+        onClick = { onReportClicked() },
         shape = RoundedCornerShape(24.dp),
         modifier = Modifier.wrapContentWidth(Alignment.Start),
         contentPadding = PaddingValues(
@@ -237,15 +282,15 @@ fun OutlinedButton(onMoreInfoClicked: () -> Unit) {
             bottom = 0.dp
         ),
         colors = ButtonDefaults.outlinedButtonColors(
-            backgroundColor = Color.Transparent,
+            backgroundColor = Color.Red,
             contentColor = Color.Black
         )
     ) {
         Text(
-            text = "More info",
-            color = grey,
+            text = "Report",
+            color = Color.White,
             fontWeight = FontWeight.Bold,
-            fontSize = 10.sp,
+            fontSize = 12.sp,
             modifier = Modifier.padding(4.dp)
         )
     }
@@ -263,6 +308,7 @@ fun AccountItemPreview_1() {
         closingBalance = 9000.0,
         annualInterestRate = 12.0,
         monthlyInstallment = 5000.0,
+        totalAdditionalFees = 500.00,
         firstPaymentDueDate = Date(),
         lastPaymentDueDate = Date(),
         numberOfInstallmentsRemaining = 12,
@@ -287,6 +333,7 @@ fun AccountItemPreview_2() {
         openingBalance = 500000.0,
         closingBalance = 9000.0,
         annualInterestRate = 12.0,
+        totalAdditionalFees = 500.00,
         monthlyInstallment = 8000.0,
         firstPaymentDueDate = Date(),
         lastPaymentDueDate = Date(),
@@ -312,6 +359,7 @@ fun AccountItemPreview_3() {
         openingBalance = 36000.0,
         closingBalance = 9000.0,
         annualInterestRate = 4.0,
+        totalAdditionalFees = 500.00,
         monthlyInstallment = 5000.0,
         firstPaymentDueDate = Date(),
         lastPaymentDueDate = Date(),
